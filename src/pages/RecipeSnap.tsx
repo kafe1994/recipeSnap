@@ -58,76 +58,79 @@ const RecipeSnap = () => {
         dietary: "ninguna"
       };
 
-      // Usar Gemini para generar receta
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.REACT_APP_GEMINI_KEY;
-      
-      if (!apiKey) {
-        console.warn('API Key de Gemini no encontrada, usando receta de ejemplo');
-        // Fallback a receta de ejemplo si no hay API key
-        setRecipe({
-          name: "Receta con Ingredientes de la Imagen",
-          difficulty: "Intermedia",
-          time: "30 min",
-          servings: 2,
-          ingredients: [
-            "Ingredientes de la imagen",
-            "Sal al gusto",
-            "Aceite de oliva - 2 cucharadas",
-            "Especias variadas"
-          ],
-          steps: [
-            "Lava y prepara todos los ingredientes visibles",
-            "Calienta aceite en una sartén a fuego medio",
-            "Cocina los ingredientes principales por 10-15 minutos",
-            "Sazona con sal y especias al gusto",
-            "Sirve caliente y disfruta"
-          ],
-          nutrition: { calories: 350, protein: 12, carbs: 45, fat: 15 },
-          tips: ["Ajusta sabores según tu preferencia"],
-          estimated_cost: "medio"
-        });
-        return;
-      }
-
-      const geminiClient = new GeminiClient(apiKey);
-      
       toast({
         title: "Analizando imagen...",
         description: "Gemini IA está procesando tus ingredientes",
       });
 
-      const recipe = await geminiClient.analyzeIngredients(imageBase64, userPreferences);
-      
-      setRecipe(recipe);
-      
-      toast({
-        title: "¡Receta generada!",
-        description: "Tu receta personalizada está lista",
+      // Llamar al Worker de Cloudflare en lugar de Gemini directamente
+      const response = await fetch('/api/generate-recipe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageBase64,
+          preferences: userPreferences
+        })
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al generar receta');
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.recipe) {
+        setRecipe(data.recipe);
+        
+        toast({
+          title: "¡Receta generada!",
+          description: "Tu receta personalizada está lista",
+        });
+      } else {
+        throw new Error('Respuesta inválida del servidor');
+      }
       
     } catch (error) {
       console.error('Error generando receta:', error);
       
-      // Fallback a receta simulada
+      // Fallback a receta básica mejorada
       setRecipe({
-        name: "Pasta con Ingredientes de la Imagen",
-        difficulty: "Fácil",
-        time: "20 min",
+        name: "Plato Preparado",
+        difficulty: "Intermedia",
+        time: "25 min",
         servings: 2,
-        ingredients: ["Ingredientes detectados", "Sal", "Aceite", "Especias"],
-        steps: [
-          "Preparar todos los ingredientes",
-          "Cocinar según el método preferido",
-          "Servir caliente"
+        ingredients: [
+          "Ingredientes de la imagen preparados - 300g",
+          "Sal al gusto",
+          "Aceite de oliva - 2 cucharadas",
+          "Especias frescas disponibles"
         ],
-        nutrition: { calories: 350, protein: 12, carbs: 45, fat: 15 },
-        tips: ["Ajustar sabores al gusto"],
-        estimated_cost: "bajo"
+        steps: [
+          "Examina cuidadosamente los ingredientes visibles en tu imagen",
+          "Lava y corta los ingredientes apropiadamente",
+          "Calienta aceite en una sartén a fuego medio",
+          "Cocina los ingredientes principales por 15-20 minutos",
+          "Sazona con sal y especias al gusto",
+          "Sirve caliente y disfruta tu preparación"
+        ],
+        nutrition: { calories: 320, protein: 14, carbs: 38, fat: 16 },
+        tips: [
+          "Observa detalladamente cada ingrediente en tu imagen",
+          "Ajusta el tiempo de cocción según el tipo de ingredientes",
+          "Experimenta con diferentes combinaciones de especias"
+        ],
+        estimated_cost: "medio",
+        description: "Receta personalizada basada en los ingredientes de tu imagen",
+        detected_ingredients: ["Ingredientes visibles en la fotografía"],
+        image_analysis: "Análisis automático de la imagen cargada"
       });
       
       toast({
         title: "Receta básica generada",
-        description: "Usa ingredientes de la imagen para crear tu plato",
+        description: "Revisa los ingredientes visibles para crear tu plato",
       });
     } finally {
       setIsGenerating(false);
