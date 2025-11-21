@@ -1,0 +1,21 @@
+name = "recipesnap-worker"
+main = "functions/_worker.js"
+compatibility_date = "2024-01-01"
+
+# Variables de entorno (las reales se configuran en el dashboard)
+[vars]
+# GEMINI_API_KEY = "AIzaSyB8upd55ASDhWllTtgKvYfe_1tNIkFZJu4"
+
+# Configuración de desarrollo
+[dev]
+port = 8787
+local_protocol = "http"
+
+# Configuración de rutas
+[[routes]]
+pattern = "recipesnap.pages.dev/api/*"
+zone_name = "recipesnap.pages.dev"
+
+# Configuración de caching
+[env.production.vars]
+# Variables para producción

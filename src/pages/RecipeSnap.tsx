@@ -7,7 +7,6 @@ import CoinDisplay from "@/components/CoinDisplay";
 import UploadZone from "@/components/UploadZone";
 import RecipeResult from "@/components/RecipeResult";
 import { useToast } from "@/hooks/use-toast";
-import GeminiClient from "../lib/gemini-client";
 
 const RecipeSnap = () => {
   const navigate = useNavigate();

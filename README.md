@@ -1,73 +1,224 @@
-# Welcome to your Lovable project
+# 🍳 RecipeSnap - Recetas IA
 
-## Project info
+Una aplicación web que genera recetas personalizadas a partir de fotos de ingredientes usando inteligencia artificial.
 
-**URL**: https://lovable.dev/projects/6dc9ea77-c080-49bf-ae5b-50bf96ad6226
+## ✨ Características
 
-## How can I edit this code?
+- **Reconocimiento de Imágenes**: Analiza fotos de ingredientes con IA
+- **Recetas Personalizadas**: Genera recetas específicas según ingredientes
+- **Sistema de Monedas**: Monetización con sistema de créditos
+- **PWA**: Instalable como aplicación nativa
+- **Mobile-First**: Optimizado para dispositivos móviles
+- **Fallback Inteligente**: Funciona sin conexión a IA
 
-There are several ways of editing your application.
+## 🚀 Deploy en Cloudflare Pages
 
-**Use Lovable**
+### 1. Preparación del Repositorio
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6dc9ea77-c080-49bf-ae5b-50bf96ad6226) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```bash
+# 1. Crear nuevo repositorio en GitHub
+# 2. Subir todos los archivos de esta carpeta
+git init
+git add .
+git commit -m "Initial commit: RecipeSnap app"
+git branch -M main
+git remote add origin https://github.com/TU_USERNAME/recipesnap.git
+git push -u origin main
 ```
 
-**Edit a file directly in GitHub**
+### 2. Conectar con Cloudflare Pages
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. **Ir al Dashboard de Cloudflare**
+   - [dash.cloudflare.com](https://dash.cloudflare.com)
+   - Seleccionar "Pages" en el menú lateral
 
-**Use GitHub Codespaces**
+2. **Crear Nuevo Proyecto**
+   - Click en "Create a project"
+   - Conectar con GitHub
+   - Seleccionar el repositorio de RecipeSnap
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+3. **Configurar Build Settings**
+   ```
+   Build command: npm run build
+   Build output directory: dist
+   Node version: 18
+   Environment: Production
+   ```
 
-## What technologies are used for this project?
+### 3. Configurar Variables de Entorno
 
-This project is built with:
+**OBLIGATORIO**: Configurar la API key de Gemini
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. **En el proyecto de Cloudflare Pages:**
+   - Ve a **Settings** → **Environment variables**
+   - Agregar variable:
 
-## How can I deploy this project?
+   ```
+   Nombre: GEMINI_API_KEY
+   Valor: tu_api_key_aqui
+   Environment: Production, Preview, Development
+   ```
 
-Simply open [Lovable](https://lovable.dev/projects/6dc9ea77-c080-49bf-ae5b-50bf96ad6226) and click on Share -> Publish.
+2. **Obtener API Key de Gemini:**
+   - Ir a [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Crear nueva API key gratuita
+   - **Límites**: 60 requests/min, 1500 requests/día
 
-## Can I connect a custom domain to my Lovable project?
+### 4. Configurar Cloudflare Worker
 
-Yes, you can!
+1. **Instalar Wrangler CLI**
+   ```bash
+   npm install -g wrangler
+   ```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+2. **Login en Cloudflare**
+   ```bash
+   wrangler login
+   ```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+3. **Desplegar Worker**
+   ```bash
+   wrangler publish
+   ```
+
+4. **Configurar Routes**
+   - El Worker maneja automáticamente las rutas `/api/generate-recipe`
+
+## 🛠️ Estructura del Proyecto
+
+```
+recipesnap-final/
+├── src/
+│   ├── components/          # Componentes React
+│   ├── hooks/              # Hooks personalizados
+│   ├── lib/                # Utilidades
+│   ├── pages/              # Páginas principales
+│   └── main.tsx            # Entry point
+├── functions/              # Cloudflare Worker
+│   └── _worker.js          # Handler de API
+├── public/                 # Archivos estáticos
+│   ├── icons/              # Iconos PWA
+│   ├── manifest.json       # PWA manifest
+│   └── sw.js               # Service Worker
+├── package.json            # Dependencias
+├── wrangler.toml           # Configuración Worker
+├── vite.config.ts          # Configuración Vite
+└── tailwind.config.ts      # Configuración Tailwind
+```
+
+## 🎯 Funcionalidades Principales
+
+### Subida de Imágenes
+- Soporte para JPG, PNG, WebP
+- Máximo 10MB por imagen
+- Vista previa inmediata
+- Optimización automática
+
+### Generación de Recetas
+- Análisis con Gemini AI (si está configurado)
+- Fallback inteligente sin IA
+- Recetas personalizadas
+- Información nutricional
+- Tips de cocina
+
+### Sistema de Monedas
+- 50 monedas iniciales
+- -10 monedas por receta generada
+- +10 monedas por anuncio visto
+- Interfaz visual clara
+
+### PWA Features
+- Instalable en dispositivos móviles
+- Service Worker para offline
+- Notificaciones de actualización
+- Experiencia nativa
+
+## 🔧 Configuración Técnica
+
+### Variables de Entorno
+
+```bash
+# API de Gemini (obligatoria)
+GEMINI_API_KEY=tu_api_key_aqui
+
+# Configuración opcional
+VITE_APP_NAME=RecipeSnap
+VITE_VERSION=1.0.0
+```
+
+### APIs Utilizadas
+
+1. **Google Gemini AI**
+   - Análisis de imágenes
+   - Generación de texto
+   - Reconocimiento de objetos
+
+2. **Cloudflare Pages**
+   - Hosting estático
+   - CDN global
+   - Deploy automático
+
+3. **Cloudflare Workers**
+   - Proxy de API
+   - Manejo de requests
+   - Caching inteligente
+
+## 🐛 Solución de Problemas
+
+### No aparece el mensaje de demo ✅
+- **Solucionado**: La aplicación funciona directamente sin modales
+
+### Error de API de Gemini
+```
+Error: API key no configurada
+```
+- **Solución**: Verificar variable `GEMINI_API_KEY` en Cloudflare
+
+### Error de Worker
+```
+Error: Worker not found
+```
+- **Solución**: Verificar que el Worker esté desplegado correctamente
+
+### Imágenes no se procesan
+- Verificar tamaño máximo (10MB)
+- Formatos soportados: JPG, PNG, WebP
+- Revisar conexión a internet
+
+## 📱 Compatibilidad
+
+- **Navegadores**: Chrome, Safari, Firefox, Edge (versiones modernas)
+- **Dispositivos**: Desktop, Tablet, Móvil
+- **Sistemas**: Windows, macOS, Linux, Android, iOS
+- **Resoluciones**: Responsive desde 320px
+
+## 🔄 Actualizaciones
+
+Para actualizar la aplicación:
+
+1. Hacer cambios en el código
+2. Commit y push a GitHub
+3. Cloudflare redeploy automático
+4. Verificar en dashboard de Pages
+
+## 📄 Licencia
+
+MIT License - Ver archivo `LICENSE` para detalles.
+
+## 👨‍💻 Desarrollado por
+
+MiniMax Agent - 2025
+
+## 📞 Soporte
+
+Si tienes problemas:
+1. Revisar logs en Cloudflare Dashboard
+2. Verificar variables de entorno
+3. Comprobar estado del Worker
+4. Testear en diferentes navegadores
+
+---
+
+🎉 **¡RecipeSnap está listo para el deploy!**
+
+La aplicación funciona completamente sin el mensaje de demo y con reconocimiento de imágenes mejorado.
