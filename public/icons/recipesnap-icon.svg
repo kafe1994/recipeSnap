@@ -1,0 +1,32 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="256" fill="url(#backgroundGradient)"/>
+  
+  <!-- Chef Hat -->
+  <path d="M256 120C300 120 336 156 336 200C336 210 332 220 324 226C324 230 324 234 324 238V240C324 242 324 244 324 246V280C324 302 306 320 284 320H228C206 320 188 302 188 280V246C188 244 188 242 188 240V238C188 234 188 230 188 226C180 220 176 210 176 200C176 156 212 120 256 120Z" fill="white"/>
+  
+  <!-- Hat Band -->
+  <rect x="200" y="200" width="112" height="40" rx="20" fill="#f97316"/>
+  
+  <!-- Face/Base -->
+  <rect x="256" y="280" width="1" height="60" fill="white"/>
+  
+  <!-- Spoon -->
+  <path d="M340 220C348 220 354 226 354 234V260C354 268 348 274 340 274C332 274 326 268 326 260V234C326 226 332 220 340 220Z" fill="white"/>
+  <path d="M354 230L380 210C384 206 390 206 394 210L398 216C402 220 402 228 398 232L372 252L354 242V230Z" fill="white"/>
+  
+  <!-- Ingredients/Circle Elements -->
+  <circle cx="200" cy="320" r="16" fill="#fed7aa"/>
+  <circle cx="320" cy="320" r="16" fill="#fdba74"/>
+  <circle cx="180" cy="340" r="12" fill="#fb923c"/>
+  <circle cx="340" cy="340" r="12" fill="#f97316"/>
+  
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="backgroundGradient" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" style="stop-color:#f97316"/>
+      <stop offset="50%" style="stop-color:#ea580c"/>
+      <stop offset="100%" style="stop-color:#c2410c"/>
+    </linearGradient>
+  </defs>
+</svg>

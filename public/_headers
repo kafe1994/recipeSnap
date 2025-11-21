@@ -1,0 +1,29 @@
+# Configuración para Cloudflare Pages
+# Place this file as _headers in your public directory
+
+# PWA Headers
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Cache static assets
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache service worker
+/sw.js
+  Cache-Control: no-cache
+
+# Cache manifest
+/manifest.json
+  Cache-Control: public, max-age=86400
+
+# Icons
+/icons/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Enable compression
+/*
+  Content-Encoding: gzip, brotli

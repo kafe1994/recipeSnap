@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    
+    <!-- PWA Meta Tags -->
+    <title>RecipeSnap - Recetas IA</title>
+    <meta name="description" content="Toma fotos de ingredientes y genera recetas personalizadas con inteligencia artificial" />
+    <meta name="author" content="RecipeSnap Team" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#f97316" />
+    <meta name="msapplication-TileColor" content="#f97316" />
+    <meta name="msapplication-navbutton-color" content="#f97316" />
+    
+    <!-- Apple PWA Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="RecipeSnap" />
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="72x72" href="/icons/icon-72x72.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/icons/icon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="128x128" href="/icons/icon-128x128.png" />
+    <link rel="icon" type="image/png" sizes="144x144" href="/icons/icon-144x144.png" />
+    <link rel="icon" type="image/png" sizes="152x152" href="/icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="RecipeSnap - Recetas IA" />
+    <meta property="og:description" content="Toma fotos de ingredientes y genera recetas personalizadas con IA" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/icons/icon-512x512.png" />
+    <meta property="og:url" content="https://your-domain.pages.dev" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="RecipeSnap - Recetas IA" />
+    <meta name="twitter:description" content="Toma fotos de ingredientes y genera recetas personalizadas con IA" />
+    <meta name="twitter:image" content="/icons/icon-512x512.png" />
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      // Register service worker for PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('[PWA] Service Worker registered successfully:', registration.scope);
+              
+              // Check for updates
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // New update available
+                    if (confirm('Nueva versión disponible. ¿Actualizar ahora?')) {
+                      window.location.reload();
+                    }
+                  }
+                });
+              });
+            })
+            .catch((error) => {
+              console.error('[PWA] Service Worker registration failed:', error);
+            });
+        });
+      }
+
+      // PWA Install Prompt
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('[PWA] Install prompt available');
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Show custom install button if desired
+        showInstallButton();
+      });
+
+      function showInstallButton() {
+        const installButton = document.createElement('button');
+        installButton.innerHTML = '📱 Instalar App';
+        installButton.style.cssText = `
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: #f97316;
+          color: white;
+          border: none;
+          padding: 12px 20px;
+          border-radius: 25px;
+          font-weight: bold;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+          z-index: 1000;
+          display: none;
+        `;
+        
+        installButton.addEventListener('click', async () => {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log('[PWA] User choice:', outcome);
+            deferredPrompt = null;
+            installButton.remove();
+          }
+        });
+        
+        document.body.appendChild(installButton);
+        
+        // Auto-hide after 10 seconds if not clicked
+        setTimeout(() => {
+          if (installButton.parentNode) {
+            installButton.style.display = 'none';
+          }
+        }, 10000);
+      }
+
+      // Handle successful installation
+      window.addEventListener('appinstalled', () => {
+        console.log('[PWA] App was installed successfully');
+        deferredPrompt = null;
+      });
+    </script>
+  </body>
+</html>

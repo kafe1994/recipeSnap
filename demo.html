@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RecipeSnap - Demo Funcional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        .gradient-hero {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+        }
+        .gradient-card {
+            background: linear-gradient(135deg, #fff7ed, #fed7aa);
+        }
+        .safe-area-pb {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <button onclick="goBack()" class="p-2 hover:bg-gray-100 rounded-lg">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-xl gradient-hero flex items-center justify-center">
+                            <i data-lucide="chef-hat" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-bold text-lg">RecipeSnap</h1>
+                            <p class="text-xs text-gray-500">Recetas IA en segundos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="bg-yellow-100 rounded-full px-3 py-1 flex items-center gap-1">
+                        <i data-lucide="coins" class="w-4 h-4 text-yellow-600"></i>
+                        <span id="coinCount" class="text-sm font-semibold text-yellow-800">50</span>
+                    </div>
+                    <button onclick="showAd()" class="bg-blue-500 text-white px-3 py-1 rounded text-xs">
+                        +10
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-6 pb-24">
+        <!-- Hero Section -->
+        <div class="text-center py-8">
+            <div class="inline-flex items-center gap-2 bg-orange-100 px-4 py-2 rounded-full mb-4">
+                <i data-lucide="zap" class="w-4 h-4 text-orange-600"></i>
+                <span class="text-orange-600 text-sm font-medium">Recetas IA en segundos</span>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">¿Qué cocinar hoy?</h1>
+            <p class="text-gray-600 max-w-sm mx-auto">
+                Toma foto a tus ingredientes y obtén recetas personalizadas al instante
+            </p>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="bg-gradient-to-r from-orange-50 to-yellow-50 border-2 border-orange-200 rounded-2xl p-6 mb-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-orange-500 flex items-center justify-center">
+                    <i data-lucide="camera" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold">Toma una foto</h2>
+                    <p class="text-sm text-gray-600">De tus ingredientes o sube desde galería</p>
+                </div>
+            </div>
+
+            <!-- Upload Zone -->
+            <div id="uploadZone" class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-orange-400 transition-colors" onclick="triggerFileUpload()">
+                <div id="uploadContent">
+                    <i data-lucide="upload" class="w-16 h-16 text-gray-400 mx-auto mb-4"></i>
+                    <p class="text-gray-600 mb-2">Haz clic para subir imagen</p>
+                    <p class="text-sm text-gray-500">JPG, PNG hasta 10MB</p>
+                </div>
+                <img id="previewImage" class="hidden w-full h-48 object-cover rounded-xl mb-4" alt="Preview">
+            </div>
+
+            <button id="generateBtn" onclick="generateRecipe()" class="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg h-14 text-lg disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                <i data-lucide="sparkles" class="w-5 h-5 mr-2 inline animate-spin hidden" id="loadingIcon"></i>
+                <span id="generateText">Generar Receta (-10 monedas)</span>
+            </button>
+        </div>
+
+        <!-- Recipe Result -->
+        <div id="recipeResult" class="hidden">
+            <div class="bg-white rounded-2xl p-6 shadow-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold" id="recipeName">Pasta Cremosa</h2>
+                    <button onclick="resetApp()" class="text-gray-500 hover:text-gray-700">
+                        <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500">Dificultad</p>
+                        <p class="font-semibold" id="recipeDifficulty">Fácil</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500">Tiempo</p>
+                        <p class="font-semibold" id="recipeTime">25 min</p>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-bold mb-3">Ingredientes:</h3>
+                    <ul id="recipeIngredients" class="space-y-1 text-sm">
+                        <li>• 200g pasta penne</li>
+                        <li>• 200g champiñones frescos</li>
+                        <li>• 2 dientes de ajo</li>
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="font-bold mb-3">Pasos:</h3>
+                    <ol id="recipeSteps" class="space-y-2 text-sm">
+                        <li>1. Cocina la pasta según instrucciones</li>
+                        <li>2. Saltea el ajo hasta dorar</li>
+                        <li>3. Agrega champiñones y cocina 5 min</li>
+                    </ol>
+                </div>
+
+                <div class="bg-gray-50 rounded-xl p-4">
+                    <p class="text-sm text-gray-600">
+                        <strong>Nota:</strong> Esta es una demo funcional. 
+                        <a href="#" onclick="showGeminiInfo()" class="text-orange-600 underline">Integrar Gemini IA</a> para análisis real de imágenes.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- How it Works -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm mt-6">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-5 h-5 text-orange-500"></i>
+                ¿Cómo funciona?
+            </h3>
+            <div class="space-y-4">
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold flex-shrink-0">1</div>
+                    <div>
+                        <p class="font-semibold">Sube una foto</p>
+                        <p class="text-sm text-gray-600">De tus ingredientes</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold flex-shrink-0">2</div>
+                    <div>
+                        <p class="font-semibold">IA genera receta</p>
+                        <p class="text-sm text-gray-600">Personalizada para ti</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold flex-shrink-0">3</div>
+                    <div>
+                        <p class="font-semibold">Cocina y disfruta</p>
+                        <p class="text-sm text-gray-600">Con instrucciones paso a paso</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom CTA for Mobile -->
+    <div id="mobileCta" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 safe-area-pb">
+        <button id="mobileGenerateBtn" onclick="generateRecipe()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg h-14 text-lg disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <i data-lucide="zap" class="w-5 h-5 mr-2 inline"></i>
+            <span>Crear Receta (-10)</span>
+        </button>
+    </div>
+
+    <!-- Demo Info Modal -->
+    <div id="infoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full">
+            <h3 class="text-lg font-bold mb-4">🚀 RecipeSnap Demo</h3>
+            <p class="text-sm text-gray-600 mb-4">
+                Esta es una versión demo funcional de RecipeSnap. Para la funcionalidad completa con IA:
+            </p>
+            <ul class="text-sm text-gray-600 mb-6 space-y-1">
+                <li>• Transferir a PC normal</li>
+                <li>• Configurar API de Gemini</li>
+                <li>• Ejecutar con Node.js</li>
+            </ul>
+            <button onclick="closeModal()" class="w-full bg-orange-500 text-white py-2 px-4 rounded-lg">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        let coins = 50;
+        let uploadedImage = null;
+        let isGenerating = false;
+
+        function goBack() {
+            window.location.href = '/';
+        }
+
+        function triggerFileUpload() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = handleImageUpload;
+            input.click();
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImage = e.target.result;
+                    document.getElementById('uploadContent').classList.add('hidden');
+                    document.getElementById('previewImage').src = uploadedImage;
+                    document.getElementById('previewImage').classList.remove('hidden');
+                    document.getElementById('generateBtn').disabled = false;
+                    document.getElementById('mobileGenerateBtn').disabled = false;
+                    showToast('¡Imagen cargada! Ahora puedes generar tu receta');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function generateRecipe() {
+            if (coins < 10) {
+                showToast('Monedas insuficientes', 'error');
+                return;
+            }
+
+            if (!uploadedImage) {
+                showToast('Primero sube una imagen', 'error');
+                return;
+            }
+
+            isGenerating = true;
+            coins -= 10;
+            updateCoins();
+
+            // Show loading state
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('mobileGenerateBtn').disabled = true;
+            document.getElementById('loadingIcon').classList.remove('hidden');
+            document.getElementById('generateText').textContent = 'Generando Receta...';
+
+            // Simulate AI generation
+            setTimeout(() => {
+                showRecipe();
+                isGenerating = false;
+                document.getElementById('loadingIcon').classList.add('hidden');
+                document.getElementById('generateText').textContent = 'Generar Receta (-10 monedas)';
+                showToast('¡Receta generada! Tu receta personalizada está lista');
+            }, 2000);
+        }
+
+        function showRecipe() {
+            const recipes = [
+                {
+                    name: "Pasta Cremosa de Champiñones",
+                    difficulty: "Fácil",
+                    time: "25 min",
+                    ingredients: [
+                        "• 200g pasta penne",
+                        "• 200g champiñones frescos", 
+                        "• 2 dientes de ajo",
+                        "• 200ml crema de leche",
+                        "• 50g queso parmesano",
+                        "• Aceite de oliva"
+                    ],
+                    steps: [
+                        "1. Cocina la pasta según instrucciones del paquete",
+                        "2. Saltea el ajo hasta dorar",
+                        "3. Agrega champiñones y cocina 5 minutos",
+                        "4. Incorpora la crema y deja reducir 3 minutos",
+                        "5. Mezcla con pasta escurrida y queso rallado"
+                    ]
+                },
+                {
+                    name: "Ensalada Mediterranean",
+                    difficulty: "Fácil", 
+                    time: "15 min",
+                    ingredients: [
+                        "• 200g tomates cherry",
+                        "• 1 pepino grande",
+                        "• 100g aceitunas",
+                        "• 150g queso feta",
+                        "• Aceite de oliva extra virgen",
+                        "• Orégano y sal"
+                    ],
+                    steps: [
+                        "1. Corta tomates y pepino en trozos",
+                        "2. Mezcla en bowl grande",
+                        "3. Agrega aceitunas y queso feta",
+                        "4. Aliña con aceite, orégano y sal",
+                        "5. Mezcla suavemente y sirve"
+                    ]
+                }
+            ];
+
+            const randomRecipe = recipes[Math.floor(Math.random() * recipes.length)];
+            
+            document.getElementById('recipeName').textContent = randomRecipe.name;
+            document.getElementById('recipeDifficulty').textContent = randomRecipe.difficulty;
+            document.getElementById('recipeTime').textContent = randomRecipe.time;
+            
+            const ingredientsList = document.getElementById('recipeIngredients');
+            ingredientsList.innerHTML = randomRecipe.ingredients.map(ing => `<li>${ing}</li>`).join('');
+            
+            const stepsList = document.getElementById('recipeSteps');
+            stepsList.innerHTML = randomRecipe.steps.map(step => `<li>${step}</li>`).join('');
+
+            document.getElementById('recipeResult').classList.remove('hidden');
+            document.getElementById('mobileCta').classList.add('hidden');
+        }
+
+        function resetApp() {
+            document.getElementById('recipeResult').classList.add('hidden');
+            document.getElementById('mobileCta').classList.remove('hidden');
+            document.getElementById('uploadContent').classList.remove('hidden');
+            document.getElementById('previewImage').classList.add('hidden');
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('mobileGenerateBtn').disabled = true;
+            uploadedImage = null;
+        }
+
+        function showAd() {
+            showToast('Viendo anuncio...', 'info');
+            setTimeout(() => {
+                coins += 10;
+                updateCoins();
+                showToast('¡Monedas ganadas! +10 monedas agregadas');
+            }, 3000);
+        }
+
+        function updateCoins() {
+            document.getElementById('coinCount').textContent = coins;
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white ${
+                type === 'error' ? 'bg-red-500' : type === 'info' ? 'bg-blue-500' : 'bg-green-500'
+            }`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function showGeminiInfo() {
+            document.getElementById('infoModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').classList.add('hidden');
+        }
+
+        // Show welcome message
+        setTimeout(() => {
+            showGeminiInfo();
+        }, 1000);
+    </script>
+</body>
+</html>
